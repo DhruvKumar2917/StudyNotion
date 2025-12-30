@@ -26,11 +26,12 @@ database.connect();
 app.use(express.json());
 app.use(cookieParser());
 app.use(
-	cors({
-		origin: "*",
-		credentials: true,
-	})
+  cors({
+    origin: "https://edtech-studynotion-three.vercel.app",
+    credentials: true,
+  })
 );
+
 app.use(
 	fileUpload({
 		useTempFiles: true,

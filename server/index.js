@@ -25,12 +25,47 @@ database.connect();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  "https://edtech1-studynotion.vercel.app", // main frontend
+  "http://localhost:3000",                  // local dev (optional)
+];
+
 app.use(
   cors({
-    origin: "https://edtech-studynotion-three.vercel.app",
-    credentials: true,
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, const allowedOrigins = [
+  "https://edtech1-studynotion.vercel.app", // main frontend
+  "http://localhost:3000",                  // local dev (optional)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // allow cookies/auth headers
   })
 );
+
+  })
+);
+
 
 app.use(
 	fileUpload({

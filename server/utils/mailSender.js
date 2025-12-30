@@ -1,32 +1,33 @@
 const nodemailer = require("nodemailer");
 
-const sendVerificationEmail = async (email, otp) => {
+const mailSender = async (email, title, body) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: 587,              // 587 is correct for Gmail STARTTLS
-      secure: false,          // MUST be false for port 587
+      host: "smtp.gmail.com",
+      port: 587,        // STARTTLS
+      secure: false,    // must be false for 587
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS, // Gmail App Password
+        pass: process.env.MAIL_PASS, // App Password
       },
-      connectionTimeout: 10000,
-      tls: { rejectUnauthorized: false },
     });
+
+    // Optional but helpful (debug)
+    await transporter.verify();
 
     const info = await transporter.sendMail({
-      from: `"StudyNotion OTP" <${process.env.MAIL_USER}>`,
+      from: `"StudyNotion" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: "Your Verification OTP",
-      html: `<h2>Your OTP Code is: <b>${otp}</b></h2><p>This code is valid for 5 minutes.</p>`,
+      subject: title,
+      html: body,
     });
 
-    console.log("OTP email sent:", info.messageId);
-    return true;
-  } catch (err) {
-    console.error("Error sending OTP mail:", err.message);
-    return false;
+    console.log("✅ Email sent:", info.response);
+    return info;
+  } catch (error) {
+    console.error("❌ Nodemailer error:", error.message);
+    return null;
   }
 };
 
-module.exports = sendVerificationEmail;
+module.exports = mailSender;

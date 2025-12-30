@@ -1,28 +1,30 @@
-const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer");
 
-const mailSender = async (email, title, body) => {
+const sendVerificationEmail = async (email, otp) => {
   try {
-    let transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
+      port: Number(process.env.MAIL_PORT),
+      secure: process.env.MAIL_PORT == 465,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
-      secure: false,
-    })
+      connectionTimeout: 10000, // stops after 10s
+      tls: { rejectUnauthorized: false },
+    });
 
-    let info = await transporter.sendMail({
-      from: `"Studynotion | CodeHelp" <${process.env.MAIL_USER}>`, // sender address
-      to: `${email}`, // list of receivers
-      subject: `${title}`, // Subject line
-      html: `${body}`, // html body
-    })
-    console.log(info.response)
-    return info
-  } catch (error) {
-    console.log(error.message)
-    return error.message
+    const info = await transporter.sendMail({
+      from: `"StudyNotion OTP" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject: "Your Verification OTP",
+      text: `Your OTP is: ${otp}`,
+    });
+
+    console.log("OTP email sent:", info.messageId);
+    return true;
+  } catch (err) {
+    console.log("Error sending OTP mail:", err.message);
+    return false;  // IMPORTANT: must return false on fail
   }
-}
-
-module.exports = mailSender
+};
